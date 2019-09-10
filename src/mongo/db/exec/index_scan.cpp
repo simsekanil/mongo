@@ -135,9 +135,8 @@ namespace mongo {
 
                 } else if (!_checker->getStartSeekPoint(&_seekPoint)) {
                     return boost::none;
-
-                    return _indexCursor->seek(_seekPoint);
                 }
+                return _indexCursor->seek(_seekPoint);
             }
         }
     }
