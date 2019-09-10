@@ -54,6 +54,8 @@ struct IndexScanParams {
     const IndexDescriptor* descriptor;
 
     IndexBounds bounds;
+    
+    BSONObj indexJump;
 
     int direction;
 
@@ -176,6 +178,9 @@ private:
     bool _startKeyInclusive;
     // Is the end key included in the range?
     bool _endKeyInclusive;
+
+    // Exact point where to start on the index for the query. Used for cursor based pagination.
+    BSONObj _indexJump;
 };
 
 }  // namespace mongo

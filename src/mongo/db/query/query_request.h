@@ -296,6 +296,14 @@ public:
         _max = max.getOwned();
     }
 
+    const BSONObj& getIndexJump() const {
+        return _indexJump;
+    }
+
+    void setIndexJump(BSONObj proj) {
+        _indexJump = proj;
+    }
+
     bool returnKey() const {
         return _returnKey;
     }
@@ -494,6 +502,8 @@ private:
 
     BSONObj _min;
     BSONObj _max;
+    // The jump point on the index for the beginning of the scan. Used for pagination.
+    BSONObj _indexJump;
 
     bool _returnKey = false;
     bool _showRecordId = false;

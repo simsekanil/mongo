@@ -1,4 +1,3 @@
-
 /**
  *    Copyright (C) 2018-present MongoDB, Inc.
  *
@@ -110,6 +109,7 @@ PlanStage* buildStages(OperationContext* opCtx,
             params.direction = ixn->direction;
             params.maxScan = ixn->maxScan;
             params.addKeyMetadata = ixn->addKeyMetadata;
+            params.indexJump = cq.getQueryRequest().getIndexJump();
             return new IndexScan(opCtx, params, ws, ixn->filter.get());
         }
         case STAGE_FETCH: {

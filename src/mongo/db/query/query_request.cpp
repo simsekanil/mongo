@@ -103,6 +103,7 @@ const char kAwaitDataField[] = "awaitData";
 const char kPartialResultsField[] = "allowPartialResults";
 const char kTermField[] = "term";
 const char kOptionsField[] = "options";
+const char kIndexJumpField[] = "indexJump";
 
 // Field names for sorting options.
 const char kNaturalSortField[] = "$natural";
@@ -297,6 +298,13 @@ StatusWith<unique_ptr<QueryRequest>> QueryRequest::parseFromFindCommand(unique_p
             }
 
             qr->_max = el.Obj().getOwned();
+        } else if (fieldName == kIndexJumpField) {
+            Status status = checkFieldType(el, Object);
+            if (!status.isOK()) {
+                return status;
+            }
+
+            qr->_indexJump = el.Obj().getOwned();
         } else if (fieldName == kReturnKeyField) {
             Status status = checkFieldType(el, Bool);
             if (!status.isOK()) {

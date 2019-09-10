@@ -75,7 +75,8 @@ IndexScan::IndexScan(OperationContext* opCtx,
       _forward(params.direction == 1),
       _params(params),
       _startKeyInclusive(IndexBounds::isStartIncludedInBound(params.bounds.boundInclusion)),
-      _endKeyInclusive(IndexBounds::isEndIncludedInBound(params.bounds.boundInclusion)) {
+      _endKeyInclusive(IndexBounds::isEndIncludedInBound(params.bounds.boundInclusion)),
+      _indexJump(params.indexJump) {
     // We can't always access the descriptor in the call to getStats() so we pull
     // any info we need for stats reporting out here.
     _specificStats.keyPattern = _keyPattern;
@@ -122,7 +123,17 @@ boost::optional<IndexKeyEntry> IndexScan::initIndexScan() {
         } else {
             _checker.reset(new IndexBoundsChecker(&_params.bounds, _keyPattern, _params.direction));
 
-            if (!_checker->getStartSeekPoint(&_seekPoint))
+            if (false == _indexJump.isEmpty()) {
+                // New pagination logic for complex queries.
+                // We will jump to the exact point where the query have left off.
+
+                _seekPoint.prefixExclusive = false;
+                _seekPoint.keySuffix.resize(_bounds.fields.size());
+                _seekPoint.suffixInclusive.resize(_bounds.fields.size());
+                _seekPoint.keyPrefix = _indexJump;
+                _seekPoint.prefixLen = _bounds.fields.size();
+
+            } else if (!_checker->getStartSeekPoint(&_seekPoint)) {
                 return boost::none;
 
             return _indexCursor->seek(_seekPoint);
