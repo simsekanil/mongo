@@ -109,6 +109,9 @@ namespace mongo {
         if (_params.bounds.isSimpleRange) {
             // Start at one key, end at another.
             _startKey = _params.bounds.startKey;
+            if (false == _indexJump.isEmpty()) {
+                _startKey = _indexJump;
+            }
             _endKey = _params.bounds.endKey;
             _indexCursor->setEndPosition(_endKey, _endKeyInclusive);
             return _indexCursor->seek(_startKey, _startKeyInclusive);
@@ -119,10 +122,13 @@ namespace mongo {
             if (IndexBoundsBuilder::isSingleInterval(
                     _params.bounds, &_startKey, &_startKeyInclusive, &_endKey, &_endKeyInclusive)) {
                 _indexCursor->setEndPosition(_endKey, _endKeyInclusive);
+                if (false == _indexJump.isEmpty()) {
+                    _startKey = _indexJump;
+                }
                 return _indexCursor->seek(_startKey, _startKeyInclusive);
             } else {
                 _checker.reset(new IndexBoundsChecker(&_params.bounds, _keyPattern, _params.direction));
-
+                
                 if (false == _indexJump.isEmpty()) {
                     // New pagination logic for complex queries.
                     // We will jump to the exact point where the query have left off.
